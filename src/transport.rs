@@ -22,6 +22,8 @@ use serde_json;
 use std::fmt;
 use tokio_io::{AsyncRead, AsyncWrite};
 
+const DOCKER_API_VERSION_PREFIX: &str = "/1.39";
+
 pub fn tar() -> Mime {
     "application/tar".parse().unwrap()
 }
@@ -75,7 +77,7 @@ impl Transport {
     where
         B: Into<Body>,
     {
-        let endpoint = endpoint.to_string();
+        let endpoint = format!("{}{}", DOCKER_API_VERSION_PREFIX, endpoint);
         self.stream_chunks(method, &endpoint, body)
             .concat2()
             .and_then(|v| {
